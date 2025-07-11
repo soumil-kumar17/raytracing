@@ -66,11 +66,11 @@ fn main() -> std::io::Result<()> {
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if mat_choice < 0.8 {
-                    let albedo = Color::random_vec().elementwise_mul(Color::random_vec());
+                    let albedo = Color::random() * (Color::random());
                     let sphere_mat = Rc::new(Lambertian::new(albedo));
                     world.add(Rc::new(Sphere::new(center, 0.2, sphere_mat)));
                 } else if mat_choice < 0.95 {
-                    let albedo = Color::random_with_min_max(0.5, 1.0);
+                    let albedo = Color::random_range(0.5, 1.0);
                     let fuzz = random_double_range(0.0, 0.5);
                     let sphere_mat = Rc::new(Metal::new(albedo, fuzz));
                     world.add(Rc::new(Sphere::new(center, 0.2, sphere_mat)));

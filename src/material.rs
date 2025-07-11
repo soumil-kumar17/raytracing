@@ -69,7 +69,7 @@ impl Material for Metal {
         attenuation: &mut Color,
         scattered: &mut Ray,
     ) -> bool {
-        let mut reflected = Vec3::reflect(&r_in.dir, &rec.normal);
+        let mut reflected = Vec3::reflect(r_in.dir, rec.normal);
         reflected = Vec3::unit_vector(reflected) + (self.fuzz * Vec3::random_unit_vector());
         *scattered = Ray::new(rec.p, reflected);
         *attenuation = self.albedo;
@@ -114,9 +114,9 @@ impl Material for Dielectric {
         let cannot_refract = ri * sin_theta > 1.0;
         let direction =
             if cannot_refract || Self::reflectance(cos_theta, ri) > utils::random_double() {
-                Vec3::reflect(&unit_dir, &rec.normal)
+                Vec3::reflect(unit_dir, rec.normal)
             } else {
-                Vec3::refract(&unit_dir, &rec.normal, ri)
+                Vec3::refract(unit_dir, rec.normal, ri).unwrap()
             };
 
         *scattered = Ray::new(rec.p, direction);

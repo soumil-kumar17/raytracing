@@ -1,4 +1,4 @@
-use std::{io::Write, ops::Neg};
+use std::{io, io::Write, ops::Neg};
 
 use crate::{
     color::{write_color, Color},
@@ -111,7 +111,7 @@ impl Camera {
         self.defocus_disk_v = self.v * defocus_radius;
     }
 
-    pub fn render(&self, world: &dyn Hittable, output: &mut dyn Write) -> std::io::Result<()> {
+    pub fn render(&self, world: &dyn Hittable, output: &mut dyn Write) -> io::Result<()> {
         writeln!(
             output,
             "P3\n{} {}\n255",
@@ -173,7 +173,7 @@ fn ray_color(r: &Ray, depth: i32, world: &dyn Hittable) -> Color {
             .mat
             .scatter(r, &mut rec_copy, &mut attenuation, &mut scattered)
         {
-            return attenuation.elementwise_mul(ray_color(&scattered, depth - 1, world));
+            return attenuation * ray_color(&scattered, depth - 1, world);
         }
         return Color::new(0.0, 0.0, 0.0);
     }
