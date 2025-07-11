@@ -59,9 +59,9 @@ fn main() -> std::io::Result<()> {
         for j in -11..11 {
             let mat_choice = random_double();
             let center = Vec3::new(
-                i as f64 + 0.9 * random_double(),
+                f64::from(i) + 0.9 * random_double(),
                 0.2,
-                j as f64 + 0.9 * random_double(),
+                f64::from(j) + 0.9 * random_double(),
             );
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
@@ -94,7 +94,7 @@ fn main() -> std::io::Result<()> {
     let mut file = File::create("output.ppm")?;
     camera.render(&world, &mut file)?;
     let elapsed = current.elapsed();
-    println!("Elapsed time : {:.4?}", elapsed);
+    println!("Elapsed time : {elapsed:.4?}");
 
     Ok(())
 }

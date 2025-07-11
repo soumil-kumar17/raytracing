@@ -75,14 +75,14 @@ impl Camera {
     }
 
     fn initialize(&mut self) {
-        self.image_height = (self.image_width as f64 / self.aspect_ratio) as i32;
+        self.image_height = (f64::from(self.image_width) / self.aspect_ratio) as i32;
         self.image_height = if self.image_height < 1 {
             1
         } else {
             self.image_height
         };
 
-        self.pixel_samples_scale = 1.0 / self.samples_per_pixel as f64;
+        self.pixel_samples_scale = 1.0 / f64::from(self.samples_per_pixel);
         self.center = self.look_from;
 
         let theta = degrees_to_radians(self.vfov);
@@ -97,8 +97,8 @@ impl Camera {
         let viewport_u = viewport_width * self.u;
         let viewport_v = viewport_height * self.v.neg();
 
-        self.pixel_delta_u = viewport_u / self.image_width as f64;
-        self.pixel_delta_v = viewport_v / self.image_height as f64;
+        self.pixel_delta_u = viewport_u / f64::from(self.image_width);
+        self.pixel_delta_v = viewport_v / f64::from(self.image_height);
 
         let viewport_upper_left =
             self.center - (self.focus_dist * self.w) - viewport_u / 2.0 - viewport_v / 2.0;
@@ -106,6 +106,7 @@ impl Camera {
         self.pixel00_loc = viewport_upper_left + 0.5 * (self.pixel_delta_u + self.pixel_delta_v);
         let defocus_radius =
             self.focus_dist * f64::tan(utils::degrees_to_radians(self.defocus_angle / 2.0));
+
         self.defocus_disk_u = self.u * defocus_radius;
         self.defocus_disk_v = self.v * defocus_radius;
     }
@@ -122,8 +123,9 @@ impl Camera {
                 let mut pixel_color = Color::new(0.0, 0.0, 0.0);
                 for _ in 0..self.samples_per_pixel {
                     let r = self.get_ray(i, j);
-                    pixel_color += ray_color(&r, self.max_depth, world)
+                    pixel_color += ray_color(&r, self.max_depth, world);
                 }
+
                 write_color(output, &(pixel_color * self.pixel_samples_scale))?;
             }
         }
@@ -133,8 +135,8 @@ impl Camera {
     fn get_ray(&self, i: i32, j: i32) -> Ray {
         let offset = Camera::sample_square();
         let pixel_sample = self.pixel00_loc
-            + ((i as f64 + offset.x) * self.pixel_delta_u)
-            + ((j as f64 + offset.y) * self.pixel_delta_v);
+            + ((f64::from(i) + offset.x) * self.pixel_delta_u)
+            + ((f64::from(j) + offset.y) * self.pixel_delta_v);
 
         let ray_origin = if self.defocus_angle <= 0.0 {
             self.center
@@ -172,9 +174,8 @@ fn ray_color(r: &Ray, depth: i32, world: &dyn Hittable) -> Color {
             .scatter(r, &mut rec_copy, &mut attenuation, &mut scattered)
         {
             return attenuation.elementwise_mul(ray_color(&scattered, depth - 1, world));
-        } else {
-            return Color::new(0.0, 0.0, 0.0);
         }
+        return Color::new(0.0, 0.0, 0.0);
     }
 
     let unit_dir = Vec3::normalized(r.dir);

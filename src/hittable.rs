@@ -26,8 +26,8 @@ pub struct HitRecord {
 impl Default for HitRecord {
     fn default() -> Self {
         Self {
-            p: Default::default(),
-            normal: Default::default(),
+            p: Vec3::default(),
+            normal: Vec3::default(),
             mat: Rc::new(MaterialZST),
             t: Default::default(),
             front_face: Default::default(),
